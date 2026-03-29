@@ -34,8 +34,7 @@ function reveal(el) {
     const type = el.dataset.type;
     el.classList.add('revealed');
     
-    // Ganti ekstensi file ke .png
-    el.style.backgroundImage = `url('assets/hex_front_${type}.png')`;
+    el.style.backgroundImage = `url('hex_front_${type}.png')`;
 
     if (type === 'trace') {
         state.tracesFound++;
