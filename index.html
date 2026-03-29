@@ -6,7 +6,11 @@
     <title>DINO DIG: PANIC!</title>
     <style>
         :root {
-            --bg-color: #2c3e50;
+            /* TEMA WARNA BARU: Krem Tulang Hangat & Cokelat Tanah */
+            --bg-color: #F4E8D1; 
+            --text-main: #3E2723; /* Cokelat tua untuk teks di background terang */
+            --panel-bg: rgba(62, 39, 35, 0.85); /* Cokelat gelap transparan untuk panel */
+            
             --text-light: #ecf0f1;
             --hex-size: 45px; 
             --primary: #e67e22;
@@ -17,17 +21,19 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-light);
+            color: var(--text-main);
             margin: 0; padding: 15px;
             display: flex; flex-direction: column; align-items: center;
-            overflow-x: hidden; /* Mencegah scroll menyamping di HP */
+            overflow-x: hidden; 
         }
 
         /* --- Layar Setup --- */
         #setup-container {
-            text-align: center; background: rgba(0,0,0,0.5); padding: 40px 20px;
-            border-radius: 20px; margin-top: 50px; border: 2px solid var(--accent);
+            text-align: center; background: var(--panel-bg); color: var(--text-light);
+            padding: 40px 20px; border-radius: 20px; margin-top: 50px; 
+            border: 2px solid var(--accent);
             width: 90%; max-width: 600px; box-sizing: border-box;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
         #setup-container h1 { color: var(--accent); font-size: 2.5em; margin-bottom: 20px; }
         .setup-controls { margin-top: 30px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;}
@@ -46,42 +52,63 @@
             margin-top: 40px; display: none; width: 100%; max-width: 300px;
         }
 
-        /* --- Kontainer Game Utama --- */
-        #game-container { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 1000px;}
+        /* --- Layout Game & Info Panel --- */
+        #game-layout {
+            display: none; 
+            width: 100%; max-width: 1200px;
+            justify-content: center; align-items: flex-start; gap: 20px;
+        }
+
+        /* Papan Panduan Kiri */
+        #info-panel {
+            background: var(--panel-bg); color: var(--text-light);
+            border: 2px solid var(--primary); border-radius: 12px; 
+            padding: 15px; width: 250px; flex-shrink: 0; box-sizing: border-box;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+        #info-panel h3 { color: var(--accent); text-align: center; margin-top: 0; border-bottom: 1px solid #795548; padding-bottom: 10px;}
+        .info-section { margin-bottom: 15px; font-size: 0.9em; line-height: 1.4; }
+        .info-section h4 { margin: 0 0 5px 0; color: #fff; }
+        .info-section ul { margin: 0; padding-left: 20px; }
+        .info-section li { margin-bottom: 4px; }
+        .info-highlight { color: var(--accent); font-weight: bold; }
+
+        /* Kontainer Game Utama */
+        #game-container { display: flex; flex-direction: column; align-items: center; width: 100%; flex-grow: 1;}
         header { text-align: center; margin-bottom: 15px; width: 100%; }
-        header h1 { margin: 0; color: var(--accent); font-size: 2.2em; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        header h1 { margin: 0; color: #D35400; font-size: 2.2em; text-shadow: 1px 1px 3px rgba(0,0,0,0.1); }
         
         .game-status { 
             font-size: 1em; margin: 10px auto; padding: 10px 15px; 
-            background: rgba(0,0,0,0.3); border-radius: 8px; display: inline-block;
+            background: var(--panel-bg); color: var(--text-light);
+            border-radius: 8px; display: inline-block;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         .status-row { margin: 5px 0; }
         #threatStatus { color: var(--danger); font-weight: bold; }
-        #globalThreatStatus { color: #e67e22; font-weight: bold; font-size: 0.9em;}
+        #globalThreatStatus { color: #f39c12; font-weight: bold; font-size: 0.9em;}
         
-        /* Hexagon Grid Container (Lebar Fleksibel) */
+        /* Hexagon Grid Container */
         #board-container { 
             position: relative; width: 100%; max-width: 800px; height: 600px; margin: 0 auto; 
-            overflow: hidden; /* Potong yang keluar batas container */
+            overflow: hidden; 
         }
         
         .hex {
             position: absolute; width: calc(var(--hex-size) * 1.732); height: calc(var(--hex-size) * 2);
-            background-color: #8e44ad;
+            background-color: #795548; /* Warna tanah heksagon yang belum dibuka */
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
             cursor: pointer; transition: transform 0.2s, filter 0.2s;
             display: flex; align-items: center; justify-content: center;
             background-size: cover; background-position: center;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-            /* Pastikan titik origin transform ada di tengah agar scale tidak bergeser */
-            transform-origin: center center;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5); transform-origin: center center;
         }
         
-        .hex.hidden { background-image: url('card-back.webp'); background-color: #7f8c8d; }
-        .hex.hidden:hover { transform: scale(1.05); filter: brightness(1.2); }
+        .hex.hidden { background-image: url('card-back.webp'); }
+        .hex.hidden:hover { transform: scale(1.05); filter: brightness(1.2); z-index: 5; }
         .hex.invalid { cursor: not-allowed; opacity: 0.8; }
         .hex.highlight { border: 2px solid var(--accent); box-shadow: 0 0 15px var(--accent); z-index: 10;}
-        .hex.bonus-mode { border: 3px solid #2ecc71; box-shadow: 0 0 20px #2ecc71; animation: pulse 1.5s infinite;}
+        .hex.bonus-mode { border: 3px solid #2ecc71; box-shadow: 0 0 20px #2ecc71; animation: pulse 1.5s infinite; z-index: 11;}
 
         @keyframes pulse { 0% { box-shadow: 0 0 10px #2ecc71; } 50% { box-shadow: 0 0 25px #2ecc71; } 100% { box-shadow: 0 0 10px #2ecc71; } }
         
@@ -96,8 +123,9 @@
             padding: 12px 20px; font-size: 1.1em; cursor: pointer;
             background-color: var(--primary); color: white; border: none; 
             border-radius: 8px; font-weight: bold; width: 100%; max-width: 400px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
-        .game-controls button:disabled { background-color: #95a5a6; cursor: not-allowed; }
+        .game-controls button:disabled { background-color: #95a5a6; cursor: not-allowed; box-shadow: none; }
 
         /* Player Dashboards */
         #players { display: grid; gap: 15px; width: 100%; margin-top: 20px; }
@@ -106,11 +134,13 @@
         #players.count-4 { grid-template-columns: repeat(4, 1fr); }
 
         .player-card { 
-            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; 
-            border: 2px solid transparent; position: relative;
-            display: flex; flex-direction: column; align-items: center; text-align: center;
+            background: var(--panel-bg); color: var(--text-light);
+            padding: 15px; border-radius: 12px; border: 2px solid transparent; 
+            position: relative; display: flex; flex-direction: column; 
+            align-items: center; text-align: center;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
         }
-        .player-card.active { border-color: var(--accent); background: rgba(241, 196, 15, 0.15); box-shadow: 0 0 15px rgba(241, 196, 15, 0.3);}
+        .player-card.active { border-color: var(--accent); background: rgba(93, 64, 55, 0.95); box-shadow: 0 0 15px rgba(241, 196, 15, 0.4);}
         .player-card h3 { margin: 0 0 10px 0; color: #fff; font-size: 1.1em;}
         
         .visual-inventory { display: flex; gap: 5px; justify-content: center; margin: 10px 0; min-height: 50px; flex-wrap: wrap; }
@@ -148,6 +178,7 @@
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background: rgba(0, 0, 0, 0.95); padding: 25px; border-radius: 15px;
             text-align: center; z-index: 100; border: 2px solid var(--accent); display: none; width: 85%; max-width: 400px; box-sizing: border-box;
+            color: var(--text-light);
         }
         #notification h2 { margin-top: 0; color: var(--danger); font-size: 1.5em;}
         #notification.success h2 { color: var(--success); }
@@ -156,29 +187,35 @@
         #notification button {
             padding: 12px 20px; cursor: pointer; background: var(--accent); width: 100%;
             border: none; border-radius: 5px; font-weight: bold; margin-top: 15px; font-size: 1.1em;
+            color: #333;
         }
         #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); z-index: 99; display: none; }
 
         /* --- MEDIA QUERIES UNTUK HP (RESPONSIVE) --- */
+        @media (max-width: 900px) {
+            #game-layout { flex-direction: column; align-items: center; }
+            #info-panel { width: 100%; max-width: 600px; order: 2; margin-top: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px;}
+            #info-panel h3 { width: 100%; }
+            .info-section { width: 48%; margin-bottom: 5px;}
+            #game-container { order: 1; }
+        }
+
         @media (max-width: 768px) {
             header h1 { font-size: 1.8em; }
             #setup-container h1 { font-size: 2em; }
             .setup-controls { flex-direction: column; }
             .player-option { width: 100%; margin: 0;}
             
-            /* Tumpuk pemain ke bawah di layar kecil */
-            #players.count-2, #players.count-3, #players.count-4 {
-                grid-template-columns: 1fr; 
-            }
+            #players.count-2, #players.count-3, #players.count-4 { grid-template-columns: 1fr; }
             .player-card { flex-direction: row; flex-wrap: wrap; justify-content: space-between; padding-top: 25px;}
             .player-card h3 { width: 100%; text-align: left; margin-bottom: 5px;}
             .set-badge { top: 5px; left: auto; right: 10px; transform: none; }
             .score { width: 100%; text-align: right; margin-top: 5px;}
             .visual-inventory { justify-content: flex-start; margin: 5px 0; width: 100%;}
             
-            /* Papan dikecilkan */
             #board-container { height: 450px; }
             .game-status { font-size: 0.9em; width: 100%; box-sizing: border-box; }
+            .info-section { width: 100%; }
         }
     </style>
 </head>
@@ -195,23 +232,66 @@
         <button id="btnStartGame" onclick="confirmStart()">Mulai Gali!</button>
     </div>
 
-    <div id="game-container">
-        <header>
-            <h1>DINO DIG: PANIC!</h1>
-            <div class="game-status">
-                <div class="status-row" id="statusText">Menunggu persiapan...</div>
-                <div class="status-row">
-                    <span id="threatStatus">Ancaman Giliran: 0/2</span> | 
-                    <span id="globalThreatStatus">Total Jejak Terbuka: 0/0</span>
-                </div>
+    <div id="game-layout">
+        
+        <aside id="info-panel">
+            <h3>Panduan Ekskavasi</h3>
+            
+            <div class="info-section">
+                <h4>🦖 Jejak T-Rex</h4>
+                <ul>
+                    <li>1 Jejak = Peringatan!</li>
+                    <li>2 Jejak = <span style="color:var(--danger)">Gagal!</span> Fosil dibuang, giliran hangus.</li>
+                </ul>
             </div>
-            <div class="game-controls">
-                <button id="btnStop" onclick="startDiceRoll()" disabled>Mundur Aman & Lempar Dadu</button>
-            </div>
-        </header>
 
-        <div id="board-container"></div>
-        <div id="players"></div>
+            <div class="info-section">
+                <h4>⭐ Poin Set Lengkap</h4>
+                <i>(1 Kepala + Badan + Kaki + Tangan)</i>
+                <ul>
+                    <li>Set Ke-1 = <span class="info-highlight">40 Poin</span></li>
+                    <li>Set Ke-2, 3 dst = <span class="info-highlight">+50 Poin/Set</span></li>
+                </ul>
+            </div>
+
+            <div class="info-section">
+                <h4>🦴 Poin Fosil Sisa</h4>
+                <ul>
+                    <li>💀 Kepala = 15 Poin</li>
+                    <li>🦴 Badan = 8 Poin</li>
+                    <li>🦵 Kaki = 3 Poin</li>
+                    <li>💪 Tangan = 3 Poin</li>
+                </ul>
+            </div>
+
+            <div class="info-section">
+                <h4>🏆 Bonus Akhir Game</h4>
+                <ul>
+                    <li>Kolektor 💀 Terbanyak = +20 Poin</li>
+                    <li>Kolektor 🦴 Terbanyak = +15 Poin</li>
+                </ul>
+            </div>
+        </aside>
+
+        <div id="game-container">
+            <header>
+                <h1>DINO DIG: PANIC!</h1>
+                <div class="game-status">
+                    <div class="status-row" id="statusText">Menunggu persiapan...</div>
+                    <div class="status-row">
+                        <span id="threatStatus">Ancaman Giliran: 0/2</span> | 
+                        <span id="globalThreatStatus">Total Jejak Terbuka: 0/0</span>
+                    </div>
+                </div>
+                <div class="game-controls">
+                    <button id="btnStop" onclick="startDiceRoll()" disabled>Mundur Aman & Lempar Dadu</button>
+                </div>
+            </header>
+
+            <div id="board-container"></div>
+            <div id="players"></div>
+        </div>
+
     </div>
 
     <div id="overlay"></div>
@@ -272,7 +352,7 @@
             }
             document.getElementById('players').className = `count-${selectedCount}`;
             document.getElementById('setup-container').style.display = 'none';
-            document.getElementById('game-container').style.display = 'flex';
+            document.getElementById('game-layout').style.display = 'flex';
             
             totalTrexRevealed = 0; 
             prepareBoard();
@@ -307,7 +387,6 @@
             const container = document.getElementById('board-container');
             container.innerHTML = '';
             
-            // LOGIKA RESPONSIVE: Hitung skala berdasarkan lebar layar vs lebar ideal (800)
             let screenWidth = container.clientWidth;
             let scaleFactor = screenWidth < 800 ? (screenWidth / 800) * 0.95 : 1; 
             
@@ -315,7 +394,6 @@
             const scaledHexSize = baseHexSize * scaleFactor;
             document.documentElement.style.setProperty('--hex-size', scaledHexSize + 'px');
 
-            // Titik tengah selalu mengikut dimensi dinamis container
             const centerX = container.clientWidth / 2; 
             const centerY = container.clientHeight / 2; 
 
@@ -341,9 +419,8 @@
             });
         }
 
-        // Render ulang papan jika layar HP diputar (Landscape/Portrait)
         window.addEventListener('resize', () => {
-            if (document.getElementById('game-container').style.display === 'flex') {
+            if (document.getElementById('game-layout').style.display === 'flex') {
                 renderBoard();
             }
         });
@@ -366,6 +443,7 @@
                    (dq===-1 && dr===0) || (dq===-1 && dr===1) || (dq===0 && dr===1);
         }
 
+        // --- BUG FIX PADA FUNGSI KLIK HEXAGON ---
         function handleHexClick(index) {
             const hex = grid[index];
             if (hex.state !== 'hidden') return;
@@ -393,13 +471,23 @@
             if (hex.type === 'trex') {
                 turnData.trex++; totalTrexRevealed++; updateThreatUI();
                 if (turnData.trex === 1) {
-                    showNotif("AWAS! JEJAK T-REX!", "T-Rex mencium baumu. Jika 1 lagi terbuka, galian hancur!");
+                    if (checkEndGame()) {
+                        saveFossils(); 
+                        showNotif("Area Habis! 🏁", "Papan telah bersih! Kartu terakhir adalah Jejak T-Rex, namun galianmu saat ini berhasil diamankan.", true);
+                    } else {
+                        showNotif("AWAS! JEJAK T-REX!", "T-Rex mencium baumu. Jika 1 lagi terbuka, galian hancur!");
+                    }
                 } else {
                     showNotif("PANIK! T-REX MUNCUL!", "Galian hancur! Giliranmu berakhir tanpa hasil!", true); return; 
                 }
             } else {
                 turnData.fossils.push(hex.type);
                 document.getElementById('btnStop').disabled = false;
+                
+                if (checkEndGame()) {
+                    saveFossils();
+                    showNotif("Area Habis! 🏁", "Papan telah bersih! Kamu berhasil menggali kartu terakhir dengan aman.", true, true);
+                }
             }
             renderBoard();
         }
