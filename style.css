@@ -35,12 +35,14 @@ h1 { letter-spacing: 5px; color: var(--neon-blue); text-shadow: 0 0 10px var(--n
 .hex {
     width: 80px;
     height: 90px;
-    background-image: url('assets/hex_back_soil.png');
+    background-image: url('assets/hex_back_soil.png'); 
     background-size: cover;
+    background-position: center;
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
     cursor: pointer;
     transition: transform 0.3s, filter 0.3s;
     position: relative;
+    background-color: transparent;
 }
 
 .hex:hover { transform: scale(1.1); filter: brightness(1.3); }
